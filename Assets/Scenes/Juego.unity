@@ -357,9 +357,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movementSpeed: 5
   jumpForce: 10
+<<<<<<< HEAD
   doubleJumpForce: 5
   dashSpeed: 15
   dashCooldown: 0.5
+=======
+  doubleJumpForce: 10
+  dashDownForce: 15
+>>>>>>> origin/main
 --- !u!54 &416415170
 Rigidbody:
   m_ObjectHideFlags: 0

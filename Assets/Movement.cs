@@ -5,8 +5,8 @@ public class PlayerMovement : MonoBehaviour
     public float movementSpeed = 5f;
     public float jumpForce = 10f;
     public float doubleJumpForce = 5f;
-    public float dashSpeed = 15f; // Speed for the lateral dash
-    public float dashCooldown = 0.5f; // Waiting time between dashes
+    public float dashSpeed = 15f; // Velocidad para el dash lateral
+    public float dashCooldown = 0.5f; // Tiempo de espera entre dashes
     private bool isGrounded;
     private bool doubleJumped;
     private bool canDash = true;
@@ -26,12 +26,12 @@ public class PlayerMovement : MonoBehaviour
         Vector3 movement = new Vector3(horizontalMovement, 0f, 0f) * movementSpeed * Time.deltaTime;
         transform.Translate(movement);
 
-        // Lateral Dash
+        // Dash lateral
         if ((Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow)) && canDash)
         {
             if (Time.time - lastDashTime < dashCooldown)
             {
-                // Double fast tap
+                // Doble pulsación rápida
                 if (Mathf.Abs(horizontalMovement) > 0.1f)
                 {
                     Dash(horizontalMovement > 0 ? Vector3.right : Vector3.left);
@@ -52,7 +52,7 @@ public class PlayerMovement : MonoBehaviour
                 rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
                 isGrounded = false;
             }
-            else // Double Jump
+            else // Doble salto
             {
                 rb.velocity = new Vector3(rb.velocity.x, 0f, 0f);
                 rb.AddForce(Vector3.up * doubleJumpForce, ForceMode.Impulse);
@@ -61,7 +61,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // Lateral dash
+    // Dash lateral
     void Dash(Vector3 direction)
     {
         rb.velocity = new Vector3(direction.x * dashSpeed, rb.velocity.y, 0f);
@@ -69,7 +69,7 @@ public class PlayerMovement : MonoBehaviour
         Invoke("ResetDash", dashCooldown);
     }
 
-    // Reset dash after DashCooldown
+    // Resetear el dash después del tiempo de espera
     void ResetDash()
     {
         rb.velocity = Vector3.zero;

@@ -5,28 +5,46 @@ public class PlayerMovement : MonoBehaviour
     public float movementSpeed = 5f;
     public float jumpForce = 10f;
     public float doubleJumpForce = 5f;
-    public float dashSpeed = 15f; // Velocity for the lateral dash
-    public float dashCooldown = 0.5f; // wait time between dashes
+    public float dashSpeed = 15f;
+    public float dashCooldown = 0.5f;
     private bool isGrounded;
     private bool doubleJumped;
     private bool canDash = true;
     private float lastDashTime;
+    private Animator animator;
 
     private Rigidbody rb;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        animator = GetComponent<Animator>();
     }
 
     void Update()
     {
-        // Horizontal movement
         float horizontalMovement = Input.GetAxis("Horizontal");
-        Vector3 movement = new Vector3(horizontalMovement, 0f, 0f) * movementSpeed * Time.deltaTime;
+        // Adjust the movement input to the rotation axis
+        Vector3 movement = new Vector3(0f, 0f, horizontalMovement) * movementSpeed * Time.deltaTime;
+
+        if (horizontalMovement > 0)
+        {
+            animator.SetBool("Walk Forward", true);
+            animator.SetBool("Walk Backward", false);
+        }
+        else if (horizontalMovement < 0)
+        {
+            animator.SetBool("Walk Forward", false);
+            animator.SetBool("Walk Backward", true);
+        }
+        else
+        {
+            animator.SetBool("Walk Forward", false);
+            animator.SetBool("Walk Backward", false);
+        }
         transform.Translate(movement);
 
-        // Dash lateral
+        // Lateral dash
         if ((Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow)) && canDash)
         {
             if (Time.time - lastDashTime < dashCooldown)
@@ -34,7 +52,8 @@ public class PlayerMovement : MonoBehaviour
                 // Double fast tap
                 if (Mathf.Abs(horizontalMovement) > 0.1f)
                 {
-                    Dash(horizontalMovement > 0 ? Vector3.right : Vector3.left);
+                    // Adjust the direction to the rotation axis
+                    Dash(Vector3.forward * (horizontalMovement > 0 ? 1 : -1));
                 }
             }
             else
@@ -64,7 +83,10 @@ public class PlayerMovement : MonoBehaviour
     // Lateral dash
     void Dash(Vector3 direction)
     {
-        rb.velocity = new Vector3(direction.x * dashSpeed, rb.velocity.y, 0f);
+        // Adjust the direction to the rotation axis
+        Vector3 dashDirection = transform.TransformDirection(direction);
+
+        rb.velocity = new Vector3(dashDirection.x * dashSpeed, rb.velocity.y, dashDirection.z * dashSpeed);
         canDash = false;
         Invoke("ResetDash", dashCooldown);
     }

@@ -1,52 +1,83 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
-public class SmashBrosCharacter : MonoBehaviour
+public class PlayerManagement : MonoBehaviour
 {
     public int startingLives = 3;
-    public float maxPercentage = 100f;
+    public float maxPercentage = 300f;
     public float respawnTime = 2f;
+    public float lowerScreenLimit = -10f; // Set the lower screen limit
     public TextMeshPro livesText;
     public TextMeshPro percentageText;
 
     private int currentLives;
     private float currentPercentage;
+    private float dyingProbability = 1f;
     private bool isRespawning;
+    private Rigidbody rb;
 
     void Start()
     {
-        currentLives = startingLives;
+        currentLives = Mathf.Max(0, startingLives);
         currentPercentage = 0f;
         isRespawning = false;
+
+        // Get a reference to the Rigidbody component
+        rb = GetComponent<Rigidbody>();
 
         UpdateUI();
     }
 
     void Update()
     {
-        // Example: Input for taking damage (you can replace this with your own damage logic)
-        if (Input.GetKeyDown(KeyCode.D))
+        // Example: Input to take damage (you can replace this with your own damage logic)
+        if (Input.GetKeyDown(KeyCode.T))
         {
-            TakeDamage(20f); // Taking 20% damage for demonstration purposes
+            // Take 20% damage for demonstration
+            TakeDamage(20f, new Vector2(-1f, 0f));
         }
 
-        // Example: Input for respawning (you can replace this with your own respawn logic)
+        // Example: Input for respawn (you can replace this with your own respawn logic)
         if (Input.GetKeyDown(KeyCode.R))
         {
             Respawn();
         }
+
+        // Check if the player is below the lower screen limit
+        if (transform.position.y < lowerScreenLimit)
+        {
+            HandleOutOfScreen();
+        }
     }
 
-    void TakeDamage(float damageAmount)
+    void TakeDamage(float damageAmount, Vector2 damageDirection)
     {
         if (!isRespawning)
         {
             currentPercentage += damageAmount;
 
-            // Check if the character is KO'd
-            if (currentPercentage >= maxPercentage)
+            // If damage is over 100%, multiply dying probability and knockback by 1.5
+            if (currentPercentage > 100f)
+            {
+                dyingProbability *= 1.5f;
+                ApplyKnockback(5.0f + dyingProbability * 0.5f, damageDirection); // Adjust the knockback multiplier
+            }
+            else
+            {
+                ApplyKnockback(3.0f, damageDirection); // Use a default multiplier for knockback
+            }
+
+            // Update dying probability
+            dyingProbability = Mathf.Min(100f, dyingProbability + (currentPercentage / maxPercentage));
+
+            // Check if the character is KO'd based on dying probability
+            if (Random.Range(0f, 100f) <= dyingProbability)
             {
                 currentLives--;
+
+                // Ensure lives do not go negative
+                currentLives = Mathf.Max(0, currentLives);
 
                 // Check if the character has more lives
                 if (currentLives > 0)
@@ -58,12 +89,32 @@ public class SmashBrosCharacter : MonoBehaviour
                 {
                     // Game over logic (you can customize this based on your game design)
                     Debug.Log("Game Over");
+                    RestartGame();
                 }
+            }
+
+            // Reset dying probability to 1% after dying
+            if (currentLives > 0)
+            {
+                dyingProbability = 1f;
             }
 
             UpdateUI();
         }
     }
+
+    void ApplyKnockback(float knockbackMultiplier, Vector2 damageDirection)
+    {
+        // Convert the 2D damage direction to 3D (assuming Z is fixed)
+        Vector3 knockbackForce = new Vector3(damageDirection.x, damageDirection.y, 0f).normalized;
+
+        // Adjust the knockback multiplier based on the dying probability
+        float adjustedKnockbackMultiplier = knockbackMultiplier * (1f + dyingProbability * 0.5f);
+
+        // Apply the knockback force to the Rigidbody component
+        rb.AddForce(knockbackForce * adjustedKnockbackMultiplier, ForceMode.Impulse);
+    }
+
 
     void Respawn()
     {
@@ -75,11 +126,21 @@ public class SmashBrosCharacter : MonoBehaviour
         Invoke("FinishRespawn", respawnTime);
     }
 
+
     void FinishRespawn()
     {
-        // Reset character properties
+        // Reset specific character properties
+        rb.velocity = Vector3.zero; // Reset the Rigidbody velocity
+        rb.angularVelocity = Vector3.zero; // Reset the Rigidbody angular velocity
+
+        // Reset other properties as needed...
+
+        // Reset general properties
         currentPercentage = 0f;
         isRespawning = false;
+
+        // Reset the character to (0, 0, 0) coordinates
+        transform.position = Vector3.zero;
 
         // Enable the character again
         gameObject.SetActive(true);
@@ -87,10 +148,23 @@ public class SmashBrosCharacter : MonoBehaviour
         UpdateUI();
     }
 
+    void HandleOutOfScreen()
+    {
+        // Here you can add logic to handle when the player goes below the lower screen limit
+        // You can apply a penalty, such as reducing lives or restarting the game
+        TakeDamage(100f, Vector2.zero); // Simulate a large amount of damage when going out of the screen
+    }
+
     void UpdateUI()
     {
         // Update TextMeshProUGUI components with current information
         livesText.text = "Lives: " + currentLives;
         percentageText.text = "Damage: " + Mathf.Round(currentPercentage) + "%";
+    }
+
+    void RestartGame()
+    {
+        // Restart the game (reload the current scene)
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

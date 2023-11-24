@@ -81,7 +81,7 @@ public class PlayerMovement : MonoBehaviour
     }
 
     // Lateral dash
-    void Dash(Vector3 direction)
+    public void Dash(Vector3 direction)
     {
         // Adjust the direction to the rotation axis
         Vector3 dashDirection = transform.TransformDirection(direction);

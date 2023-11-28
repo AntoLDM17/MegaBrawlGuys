@@ -4,57 +4,60 @@ public class PlayerMovement : MonoBehaviour
 {
     public float movementSpeed = 5f;
     public float jumpForce = 10f;
-    public float doubleJumpForce = 5f;
-    public float dashSpeed = 15f;
-    public float dashCooldown = 0.5f;
+    public float doubleJumpForce = 7.5f;
+    public float dashSpeed = 11f; // Velocidad para el dash lateral
+    public float dashDownForce = 20f; // Fuerza para el dash hacia abajo
+    public float dashCooldown = 0.25f; // Tiempo de espera entre dashes
     private bool isGrounded;
     private bool doubleJumped;
     private bool canDash = true;
+    private bool canDashDown = true;
     private float lastDashTime;
-    private Animator animator;
+    private float lastDashDownTime;
+
+    public KeyCode leftKey = KeyCode.LeftArrow;
+    public KeyCode rightKey = KeyCode.RightArrow;
+    public KeyCode downKey = KeyCode.DownArrow;
+    public KeyCode jumpKey = KeyCode.Space;
 
     private Rigidbody rb;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        animator = GetComponent<Animator>();
+    }
+
+    float GetHorizontalMovement()
+    {
+        float horizontalMovement = 0f;
+
+        if (Input.GetKey(leftKey))
+        {
+            horizontalMovement -= 1f;
+        }
+
+        if (Input.GetKey(rightKey))
+        {
+            horizontalMovement += 1f;
+        }
+
+        return horizontalMovement;
     }
 
     void Update()
     {
-        float horizontalMovement = Input.GetAxis("Horizontal");
-        // Adjust the movement input to the rotation axis
-        Vector3 movement = new Vector3(0f, 0f, horizontalMovement) * movementSpeed * Time.deltaTime;
-
-        if (horizontalMovement > 0)
-        {
-            animator.SetBool("Walk Forward", true);
-            animator.SetBool("Walk Backward", false);
-        }
-        else if (horizontalMovement < 0)
-        {
-            animator.SetBool("Walk Forward", false);
-            animator.SetBool("Walk Backward", true);
-        }
-        else
-        {
-            animator.SetBool("Walk Forward", false);
-            animator.SetBool("Walk Backward", false);
-        }
+        // Horizontal movement
+        float horizontalMovement = GetHorizontalMovement();
+        Vector3 movement = new Vector3(horizontalMovement, 0f, 0f) * movementSpeed * Time.deltaTime;
         transform.Translate(movement);
 
-        // Lateral dash
-        if ((Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow)) && canDash)
+        // Dash lateral
+        if ((Input.GetKeyDown(leftKey) || Input.GetKeyDown(rightKey)) && canDash)
         {
             if (Time.time - lastDashTime < dashCooldown)
             {
-                // Double fast tap
-                if (Mathf.Abs(horizontalMovement) > 0.1f)
-                {
-                    // Adjust the direction to the rotation axis
-                    Dash(Vector3.forward * (horizontalMovement > 0 ? 1 : -1));
-                }
+                // Doble pulsación rápida lateral
+                DashHorizontal(horizontalMovement > 0 ? Vector3.right : Vector3.left);
             }
             else
             {
@@ -62,8 +65,22 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
+        // Dash hacia abajo
+        if (Input.GetKeyDown(downKey) && canDashDown)
+        {
+            if (Time.time - lastDashDownTime < dashCooldown)
+            {
+                // Doble pulsación rápida hacia abajo
+                DashDown();
+            }
+            else
+            {
+                lastDashDownTime = Time.time;
+            }
+        }
+
         // Jump
-        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow)) && (isGrounded || !doubleJumped))
+        if ((Input.GetKeyDown(jumpKey)) && (isGrounded || !doubleJumped))
         {
             if (isGrounded)
             {
@@ -71,7 +88,7 @@ public class PlayerMovement : MonoBehaviour
                 rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
                 isGrounded = false;
             }
-            else // Double jump
+            else // Doble salto
             {
                 rb.velocity = new Vector3(rb.velocity.x, 0f, 0f);
                 rb.AddForce(Vector3.up * doubleJumpForce, ForceMode.Impulse);
@@ -80,22 +97,33 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // Lateral dash
-    public void Dash(Vector3 direction)
+    // Dash lateral
+    void DashHorizontal(Vector3 direction)
     {
-        // Adjust the direction to the rotation axis
-        Vector3 dashDirection = transform.TransformDirection(direction);
-
-        rb.velocity = new Vector3(dashDirection.x * dashSpeed, rb.velocity.y, dashDirection.z * dashSpeed);
+        rb.velocity = new Vector3(direction.x * dashSpeed, rb.velocity.y, 0f);
         canDash = false;
         Invoke("ResetDash", dashCooldown);
     }
 
-    // Reset dash after dashCooldown
+    // Dash hacia abajo
+    void DashDown()
+    {
+        rb.velocity = new Vector3(rb.velocity.x, 0f, 0f); // Reinicia la velocidad vertical
+        rb.AddForce(Vector3.down * dashDownForce, ForceMode.Impulse);
+        canDashDown = false;
+        Invoke("ResetDashDown", dashCooldown);
+    }
+
+    // Resetear el dash lateral después del tiempo de espera
     void ResetDash()
     {
-        rb.velocity = Vector3.zero;
         canDash = true;
+    }
+
+    // Resetear el dash hacia abajo después del tiempo de espera
+    void ResetDashDown()
+    {
+        canDashDown = true;
     }
 
     // Called when the player touches the ground

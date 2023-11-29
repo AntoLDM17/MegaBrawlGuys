@@ -112,7 +112,7 @@ public class PlayerManagement : MonoBehaviour
         float adjustedKnockbackMultiplier = knockbackMultiplier * (1f + dyingProbability * 0.5f);
 
         // Apply the knockback force to the Rigidbody component
-        rb.AddForce(knockbackForce * adjustedKnockbackMultiplier*10, ForceMode.Impulse);
+        rb.AddForce(knockbackForce * adjustedKnockbackMultiplier, ForceMode.Impulse);
     }
 
 

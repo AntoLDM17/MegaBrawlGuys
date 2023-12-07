@@ -5,9 +5,9 @@ public class PlayerMovement : MonoBehaviour
     public float movementSpeed = 5f;
     public float jumpForce = 10f;
     public float doubleJumpForce = 7.5f;
-    public float dashSpeed = 11f; // Velocidad para el dash lateral
-    public float dashDownForce = 20f; // Fuerza para el dash hacia abajo
-    public float dashCooldown = 0.25f; // Tiempo de espera entre dashes
+    public float dashSpeed = 11f; // Lateral dash velocity
+    public float dashDownForce = 20f; // Downward dash force
+    public float dashCooldown = 0.25f; // Time between dashes
     private bool isGrounded;
     private bool doubleJumped;
     private bool canDash = true;
@@ -21,6 +21,16 @@ public class PlayerMovement : MonoBehaviour
     public KeyCode jumpKey = KeyCode.Space;
 
     private Rigidbody rb;
+
+    public float MovementSpeed // Public property to access the movement speed
+    {
+        get { return movementSpeed; }
+    }
+
+    public float JumpForce // Public property to access the jump force
+    {
+        get { return jumpForce; }
+    }
 
     void Start()
     {
@@ -51,12 +61,12 @@ public class PlayerMovement : MonoBehaviour
         Vector3 movement = new Vector3(horizontalMovement, 0f, 0f) * movementSpeed * Time.deltaTime;
         transform.Translate(movement);
 
-        // Dash lateral
+        // Lateral dash
         if ((Input.GetKeyDown(leftKey) || Input.GetKeyDown(rightKey)) && canDash)
         {
             if (Time.time - lastDashTime < dashCooldown)
             {
-                // Doble pulsación rápida lateral
+                // Double tap left or right
                 DashHorizontal(horizontalMovement > 0 ? Vector3.right : Vector3.left);
             }
             else
@@ -70,7 +80,7 @@ public class PlayerMovement : MonoBehaviour
         {
             if (Time.time - lastDashDownTime < dashCooldown)
             {
-                // Doble pulsación rápida hacia abajo
+                // Double tap down
                 DashDown();
             }
             else
@@ -88,7 +98,7 @@ public class PlayerMovement : MonoBehaviour
                 rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
                 isGrounded = false;
             }
-            else // Doble salto
+            else // Double jump
             {
                 rb.velocity = new Vector3(rb.velocity.x, 0f, 0f);
                 rb.AddForce(Vector3.up * doubleJumpForce, ForceMode.Impulse);
@@ -97,7 +107,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // Dash lateral
+    // Lateral dash
     void DashHorizontal(Vector3 direction)
     {
         rb.velocity = new Vector3(direction.x * dashSpeed, rb.velocity.y, 0f);
@@ -105,7 +115,7 @@ public class PlayerMovement : MonoBehaviour
         Invoke("ResetDash", dashCooldown);
     }
 
-    // Dash hacia abajo
+    // Downward dash
     void DashDown()
     {
         rb.velocity = new Vector3(rb.velocity.x, 0f, 0f); // Reinicia la velocidad vertical
@@ -114,13 +124,13 @@ public class PlayerMovement : MonoBehaviour
         Invoke("ResetDashDown", dashCooldown);
     }
 
-    // Resetear el dash lateral después del tiempo de espera
+    // Reset lateral dash after cooldown
     void ResetDash()
     {
         canDash = true;
     }
 
-    // Resetear el dash hacia abajo después del tiempo de espera
+    // Reset dash after cooldown
     void ResetDashDown()
     {
         canDashDown = true;

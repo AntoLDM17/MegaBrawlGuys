@@ -1176,6 +1176,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Berserker
       objectReference: {fileID: 0}
+    - target: {fileID: 100108, guid: df7ef05fa87d48248ba181823b336391, type: 3}
+      propertyPath: m_TagString
+      value: Player
+      objectReference: {fileID: 0}
     - target: {fileID: 400108, guid: df7ef05fa87d48248ba181823b336391, type: 3}
       propertyPath: m_LocalScale.x
       value: 1
@@ -2035,6 +2039,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 100108, guid: df7ef05fa87d48248ba181823b336391, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1736584081}
+    - targetCorrespondingSourceObject: {fileID: 100108, guid: df7ef05fa87d48248ba181823b336391, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1736584082}
+    - targetCorrespondingSourceObject: {fileID: 100108, guid: df7ef05fa87d48248ba181823b336391, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1736584085}
   m_SourcePrefab: {fileID: 100100000, guid: df7ef05fa87d48248ba181823b336391, type: 3}
 --- !u!1 &1723917894
 GameObject:
@@ -2249,6 +2259,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   punchKey: 256
   kickKey: 257
+  punchingRange: 2
+  kickingRange: 4
+--- !u!114 &1736584082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1736584071}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 498df2a9bce010d4c903529ce680621a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionRange: 5
+  punchRange: 2
+  kickRange: 4
+  stopDistance: 1
+  attackCooldown: 2
+  jumpThreshold: 2
+--- !u!114 &1736584085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1736584071}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c210845b9f42cb4e9d031642a27ab3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   punchingRange: 2
   kickingRange: 4
 --- !u!1 &1882973954 stripped

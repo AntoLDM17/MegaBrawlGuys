@@ -539,8 +539,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 356ec9aa819168746ab499133fad865c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  punchKey: 113
-  kickKey: 101
+  punchKey: 101
+  kickKey: 114
   punchingRange: 2
   kickingRange: 4
 --- !u!1 &429713919
@@ -1718,9 +1718,6 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 426276125789156457, guid: 40bbc21cd00e84c91bf6a11ddeedb543, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1882973957}
-    - targetCorrespondingSourceObject: {fileID: 426276125789156457, guid: 40bbc21cd00e84c91bf6a11ddeedb543, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 1882973958}
     - targetCorrespondingSourceObject: {fileID: 426276125789156457, guid: 40bbc21cd00e84c91bf6a11ddeedb543, type: 3}
       insertIndex: -1
@@ -2279,6 +2276,7 @@ MonoBehaviour:
   stopDistance: 1
   attackCooldown: 2
   jumpThreshold: 2
+  dashCooldown: 2
 --- !u!114 &1736584085
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2298,23 +2296,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 426276125789156457, guid: 40bbc21cd00e84c91bf6a11ddeedb543, type: 3}
   m_PrefabInstance: {fileID: 1088249159}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1882973957
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1882973954}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea5a865b6b29f3e4ba0face970952274, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  movementSpeed: 5
-  jumpForce: 10
-  doubleJumpForce: 5
-  dashSpeed: 15
-  dashCooldown: 0.5
 --- !u!54 &1882973958
 Rigidbody:
   m_ObjectHideFlags: 0

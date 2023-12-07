@@ -31,19 +31,6 @@ public class PlayerManagement : MonoBehaviour
 
     void Update()
     {
-        // Example: Input to take damage (you can replace this with your own damage logic)
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            // Take 20% damage for demonstration
-            TakeDamage(20f, new Vector2(-1f, 0f));
-        }
-
-        // Example: Input for respawn (you can replace this with your own respawn logic)
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            Respawn();
-        }
-
         // Check if the player is below the lower screen limit
         if (transform.position.y < lowerScreenLimit)
         {
@@ -70,28 +57,6 @@ public class PlayerManagement : MonoBehaviour
 
             // Update dying probability
             dyingProbability = Mathf.Min(100f, dyingProbability + (currentPercentage / maxPercentage));
-
-            // Check if the character is KO'd based on dying probability
-            if (Random.Range(0f, 100f) <= dyingProbability)
-            {
-                currentLives--;
-
-                // Ensure lives do not go negative
-                currentLives = Mathf.Max(0, currentLives);
-
-                // Check if the character has more lives
-                if (currentLives > 0)
-                {
-                    // If there are lives left, initiate respawn
-                    Respawn();
-                }
-                else
-                {
-                    // Game over logic (you can customize this based on your game design)
-                    Debug.Log("Game Over");
-                    RestartGame();
-                }
-            }
 
             // Reset dying probability to 1% after dying
             if (currentLives > 0)
@@ -133,8 +98,6 @@ public class PlayerManagement : MonoBehaviour
         rb.velocity = Vector3.zero; // Reset the Rigidbody velocity
         rb.angularVelocity = Vector3.zero; // Reset the Rigidbody angular velocity
 
-        // Reset other properties as needed...
-
         // Reset general properties
         currentPercentage = 0f;
         isRespawning = false;
@@ -150,9 +113,24 @@ public class PlayerManagement : MonoBehaviour
 
     void HandleOutOfScreen()
     {
-        // Here you can add logic to handle when the player goes below the lower screen limit
-        // You can apply a penalty, such as reducing lives or restarting the game
-        TakeDamage(100f, Vector2.zero); // Simulate a large amount of damage when going out of the screen
+        // We apply a penalty, such as reducing lives or restarting the game
+        currentLives--;
+
+        // Ensure lives do not go negative
+        currentLives = Mathf.Max(0, currentLives);
+
+        // Check if the character has more lives
+        if (currentLives > 0)
+        {
+            // If there are lives left, initiate respawn
+            Respawn();
+        }
+        else
+        {
+            // Game over logic (you can customize this based on your game design)
+            Debug.Log("Game Over");
+            RestartGame();
+        }
     }
 
     void UpdateUI()

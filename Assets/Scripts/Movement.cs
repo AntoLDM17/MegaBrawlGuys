@@ -32,6 +32,15 @@ public class PlayerMovement : MonoBehaviour
         get { return jumpForce; }
     }
 
+    public float DoubleJumpForce // Public property to access the double jump force
+    {
+        get { return doubleJumpForce; }
+    }
+    public float DashSpeed // Public property to access the dash speed
+    {
+        get { return dashSpeed; }
+    }
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -56,11 +65,15 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        // Horizontal movement
         float horizontalMovement = GetHorizontalMovement();
         Vector3 movement = new Vector3(horizontalMovement, 0f, 0f) * movementSpeed * Time.deltaTime;
-        transform.Translate(movement);
+        transform.Translate(movement, Space.World); // Use Space.World to move in the world space
 
+        // Set player rotation based on the horizontal movement direction
+        if (horizontalMovement != 0)
+        {
+            transform.rotation = Quaternion.LookRotation(new Vector3(horizontalMovement, 0f, 0f));
+        }
         // Lateral dash
         if ((Input.GetKeyDown(leftKey) || Input.GetKeyDown(rightKey)) && canDash)
         {

@@ -27,10 +27,11 @@ public class GameModeManager : MonoBehaviour
 
     private void Start()
     {
-        // Set the initial game mode (you can set it through the Unity Editor)
-        SetGameMode(GameMode.PlayerVsPlayer);
+        // You can remove the following line since you want the configuration to be done in the Unity Editor
+
     }
 
+    // Make this method public so you can call it from other scripts or from Unity events
     public void SetGameMode(GameMode newGameMode)
     {
         currentGameMode = newGameMode;

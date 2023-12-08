@@ -10,7 +10,7 @@ public class AIAttack : MonoBehaviour
     void Start()
     {
         // Get a reference to the PlayerManagement script
-        playerManagement = GetComponent<PlayerManagement>();
+        //playerManagement = GetComponent<PlayerManagement>();
     }
 
     public void Attack(float damage)

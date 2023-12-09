@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
+using System.Threading;
 
 public class PlayerManagement : MonoBehaviour
 {
@@ -8,14 +9,18 @@ public class PlayerManagement : MonoBehaviour
     public float maxPercentage = 300f;
     public float respawnTime = 2f;
     public float lowerScreenLimit = -10f; // Set the lower screen limit
-    public TextMeshPro livesText;
-    public TextMeshPro percentageText;
+
 
     private int currentLives;
     private float currentPercentage;
     private float dyingProbability = 1f;
     private bool isRespawning;
     private Rigidbody rb;
+
+    public TextMeshProUGUI livesTextUI;
+    public TextMeshProUGUI percentageTextUI;
+
+
 
     void Start()
     {
@@ -36,6 +41,23 @@ public class PlayerManagement : MonoBehaviour
         {
             HandleOutOfScreen();
         }
+
+        // Check for game over
+        if (currentLives <= 0)
+        {
+            // Trigger game over logic
+            GameOver();
+        }
+    }
+
+    void GameOver()
+    {
+        // Disable the character temporarily during respawn
+        isRespawning = true;
+        gameObject.SetActive(false);
+
+        // Reset damage and perform respawn logic after a delay
+        Invoke("FinishRespawn", respawnTime);
     }
 
     void TakeDamage(float damageAmount, Vector2 damageDirection)
@@ -103,13 +125,20 @@ public class PlayerManagement : MonoBehaviour
         isRespawning = false;
 
         // Reset the character to (0, 0, 0) coordinates
-        transform.position = Vector3.zero;
+        transform.position = new Vector3(0f, 3f, 0f);
 
         // Enable the character again
         gameObject.SetActive(true);
 
+        if (currentLives < 0)
+        {
+            // Notify MainMenu when the game is over
+            FindObjectOfType<MainMenu>().ShowButtonsOnGameOver();
+        }
         UpdateUI();
     }
+
+
 
     void HandleOutOfScreen()
     {
@@ -136,9 +165,10 @@ public class PlayerManagement : MonoBehaviour
     void UpdateUI()
     {
         // Update TextMeshProUGUI components with current information
-        livesText.text = "Lives: " + currentLives;
-        percentageText.text = "Damage: " + Mathf.Round(currentPercentage) + "%";
+        livesTextUI.text = "Lives: " + currentLives;
+        percentageTextUI.text = "Damage: " + Mathf.Round(currentPercentage) + "%";
     }
+
 
     void RestartGame()
     {

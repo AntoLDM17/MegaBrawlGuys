@@ -59,4 +59,5 @@ public class AIAttack : MonoBehaviour
         // Calculate the direction from the attacker to the target
         return (targetPosition - transform.position).normalized;
     }
+
 }

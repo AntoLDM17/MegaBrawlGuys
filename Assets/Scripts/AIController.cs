@@ -13,7 +13,6 @@ public class AIController : MonoBehaviour
     private GameObject player;
     private PlayerMovement playerMovement;
     private AIAttack aiAttack;
-    private GameModeManager gameModeManager;
     private float lastAttackTime;
     private bool isGrounded;
     private bool canDoubleJump = true;
@@ -26,14 +25,6 @@ public class AIController : MonoBehaviour
         playerMovement = player.GetComponent<PlayerMovement>();
         aiAttack = GetComponent<AIAttack>();
         rb = GetComponent<Rigidbody>(); // Assign the Rigidbody component
-        gameModeManager = FindObjectOfType<GameModeManager>(); // Find the GameModeManager
-
-        // Disable the script if the game mode is Player vs Player
-        if (gameModeManager.currentGameMode == GameModeManager.GameMode.PlayerVsPlayer)
-        {
-            enabled = false;
-            return;
-        }
 
         if (rb == null)
         {
@@ -48,53 +39,48 @@ public class AIController : MonoBehaviour
             Debug.LogError("AIAttack component is missing on the AI GameObject.");
             // Disable the script if the AIAttack component is missing
             enabled = false;
-            return;
         }
     }
 
     void Update()
     {
-        // Check if the game mode is Player vs AI
-        if (gameModeManager.currentGameMode == GameModeManager.GameMode.PlayerVsAI)
+        float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+
+        if (distanceToPlayer < detectionRange)
         {
-            float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
-
-            if (distanceToPlayer < detectionRange)
+            if (distanceToPlayer > stopDistance)
             {
-                if (distanceToPlayer > stopDistance)
-                {
-                    MoveTowardsPlayer();
-                }
+                MoveTowardsPlayer();
+            }
 
-                if (Time.time - lastAttackTime >= attackCooldown)
+            if (Time.time - lastAttackTime >= attackCooldown)
+            {
+                if (distanceToPlayer < punchRange)
                 {
-                    if (distanceToPlayer < punchRange)
-                    {
-                        // Perform punch attack
-                        aiAttack.Attack(30f);
-                        lastAttackTime = Time.time;
-                    }
-                    else if (distanceToPlayer < kickRange)
-                    {
-                        // Perform kick attack
-                        aiAttack.Attack(50f);
-                        lastAttackTime = Time.time;
-                    }
+                    // Perform punch attack
+                    aiAttack.Attack(30f);
+                    lastAttackTime = Time.time;
                 }
-
-                // Check if the player is above the AI and jump
-                float heightDifference = player.transform.position.y - transform.position.y;
-                if (heightDifference > 0 && heightDifference > jumpThreshold && isGrounded)
+                else if (distanceToPlayer < kickRange)
                 {
-                    Jump();
+                    // Perform kick attack
+                    aiAttack.Attack(50f);
+                    lastAttackTime = Time.time;
                 }
             }
 
-            // Check if the AI is out of the scenario and double jump with lateral dash to get back in
-            if (!AmIWithinLimits() && canDoubleJump)
+            // Check if the player is above the AI and jump
+            float heightDifference = player.transform.position.y - transform.position.y;
+            if (heightDifference > 0 && heightDifference > jumpThreshold && isGrounded)
             {
-                DoubleJumpAndLateralDash();
+                Jump();
             }
+        }
+
+        // Check if the AI is out of the scenario and double jump with lateral dash to get back in
+        if (!AmIWithinLimits() && canDoubleJump)
+        {
+            DoubleJumpAndLateralDash();
         }
     }
 
